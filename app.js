@@ -1,37 +1,101 @@
-let fspeed = [240, 240, 300, 300, 360, 360, 420, 420, 480, 480, 540, 540];
-let sspeed = [300, 360, 360, 480, 540, 420, 480, 540, 540, 600, 600, 600];
-let ftime = [1800, 1804, 1801, 1803, 1802, 1805, 1800, 1803, 1801, 1804, 1802, 1805];
-let stime = [1807, 1809, 1805, 1806, 1810, 1811, 1804, 1806, 1804, 1806, 1804, 1808];
-let fanswer = 0;
-let sanswer = 0;
-let tanswer = 0;
+let fAircraft = ["ACA123", "WJA456", "CGNDU", "BAW274", "DLH448"]
+let sAircraft = ["WJA567", "CGNDV", "BAW278", "DLH258", "ACA1118"]
+let fRandomSpeed = 0;
+let sRandomSpeed = 0;
+let fRandomTime = 0;
+let sRandomTime = 0;
+let index = 0;
+let fAnswer = 0;
+let sAnswer = 0;
+let tAnswer = 0;
 
-const newProblem = () => {
+const newEasyProblem = () => {
+    document.querySelector("#hardInstructions").innerHTML = "";
+    clearAnswers();
+    loadACID();
+    loadEasySpeed();    
+    computeAnswers();
+}
+const newHardProblem = () => {
+    document.querySelector("#hardInstructions").innerHTML = "To match the answers, round miles/min to the nearest integer. Round closure to nearest 60 kts if +-10. Round time down"
+    clearAnswers();
+    loadACID();
+    loadHardSpeed();   
+    computeAnswers();
+}
+const clearAnswers = () => {
     document.querySelector("#fanswer").innerHTML = "";
     document.querySelector("#sanswer").innerHTML = "";
     document.querySelector("#tanswer").innerHTML = "";
-    let index = Math.floor(Math.random() * 12);
-    document.querySelector("#fspeed").innerHTML = fspeed[index];
-    document.querySelector("#sspeed").innerHTML = sspeed[index];
-    document.querySelector("#ftime").innerHTML = ftime[index];
-    document.querySelector("#stime").innerHTML = stime[index];
-    let timeDiff = stime[index] - ftime[index];
-    let closure = (sspeed[index] - fspeed[index]) / 60;
-    fanswer = (sspeed[index]/60) * timeDiff;
-    sanswer = (fspeed[index]/60) * timeDiff;
-    tanswer = Math.floor(ftime[index] + ((fanswer - 5) / closure));
 }
-const fcheckAnswer = () => {
-    document.querySelector("#fanswer").innerHTML = fanswer; 
+const loadACID = () => {
+    index = Math.floor(Math.random() * 5);
+    document.querySelector("#fplane").innerHTML = fAircraft[index];
+    document.querySelector("#splane").innerHTML = sAircraft[index];
+    document.querySelector("#fquestion").innerHTML = fAircraft[index];
+    document.querySelector("#squestion").innerHTML = sAircraft[index];
 }
-const scheckAnswer = () => {
-    document.querySelector("#sanswer").innerHTML = sanswer;
+const loadEasySpeed = () => {
+    fRandomSpeed = getRandomInt(4, 8) * 60;
+    sRandomSpeed = fRandomSpeed + getRandomInt(1, 3) * 60;
+    fRandomTime = getRandomInt(1800, 1805);
+    sRandomTime = fRandomTime + getRandomInt(3, 7);
+    document.querySelector("#fspeed").innerHTML = fRandomSpeed;
+    document.querySelector("#sspeed").innerHTML = sRandomSpeed;
+    document.querySelector("#ftime").innerHTML = fRandomTime;
+    document.querySelector("#stime").innerHTML = sRandomTime;
 }
-const tcheckAnswer = () => {
-    document.querySelector("#tanswer").innerHTML = tanswer;
+const loadHardSpeed = () => {
+    fRandomSpeed = getRandomInt(24, 54) * 10;
+    sRandomSpeed = fRandomSpeed + getRandomInt(2, 12) * 10;
+    fRandomTime = getRandomInt(1800, 1805);
+    sRandomTime = fRandomTime + getRandomInt(3, 7);
+    document.querySelector("#fspeed").innerHTML = fRandomSpeed;
+    document.querySelector("#sspeed").innerHTML = sRandomSpeed;
+    document.querySelector("#ftime").innerHTML = fRandomTime;
+    document.querySelector("#stime").innerHTML = sRandomTime;
+}
+const computeAnswers = () => {
+    let timeDiff = sRandomTime - fRandomTime;
+    let speedDiff = (sRandomSpeed - fRandomSpeed);
+    if ((speedDiff + 10) % 60 == 0) {
+        speedDiff += 10;
+    }
+    else if ((speedDiff + 10) % 60 == 0) {
+        speedDiff -= 10;
+    }
+    let closure = speedDiff / 60;
+    fAnswer = Math.round(sRandomSpeed/60) * timeDiff;
+    sAnswer = Math.round(fRandomSpeed/60) * timeDiff;
+    tAnswer = Math.floor(fRandomTime + ((fAnswer - 5) / closure));
+    if (tAnswer >= 1860) {
+        tAnswer += 40;
+    }
+    if (tAnswer >= 1960) {
+        tAnswer += 40;
+    }
+}
+const fCheckAnswer = () => {
+    document.querySelector("#fanswer").innerHTML = fAnswer; 
+}
+const sCheckAnswer = () => {
+    document.querySelector("#sanswer").innerHTML = sAnswer;
+}
+const tCheckAnswer = () => {
+    document.querySelector("#tanswer").innerHTML = tAnswer;
 }
 
-document.querySelector("#new").addEventListener("click", newProblem)
-document.querySelector("#fb").addEventListener("click", fcheckAnswer)
-document.querySelector("#sb").addEventListener("click", scheckAnswer)
-document.querySelector("#tb").addEventListener("click", tcheckAnswer)
+// helper functions
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+document.querySelector("#newEasy").addEventListener("click", newEasyProblem)
+document.querySelector("#newHard").addEventListener("click", newHardProblem)
+document.querySelector("#fbutton").addEventListener("click", fCheckAnswer)
+document.querySelector("#sbutton").addEventListener("click", sCheckAnswer)
+document.querySelector("#tbutton").addEventListener("click", tCheckAnswer)
+addEventListener('DOMContentLoaded', () => {newEasyProblem()});
